@@ -7,9 +7,24 @@ Simple games to play in the terminal
 *  - [ ] Tetris
 *  - [ ] Battleships
 
+## Usage Instructions
+
+  * To run the minigame interface, the 'termGame' file can be executed as any other executable file with the name of the game to play as an argument due to it's shebang addition, allowing the user to call, for example './termGame 2048' to launch the 2048 game
+  * To exit games and return to the termGame CLI, the user should press the 'Q' key and to run games from within the CLI, the user only needs to type the name of the game and press return
+  * To exit the CLI, the user should run the command 'quit'
+  * For a full list of commands, the user should run the command 'help'
+
 ## Milestone Log
 
 2021/03/10
   * Python terminal window updating process implemented with curses
   * Basic board printing and movement capabilities implemented for 2048 game
   * Some bugs with combining squares yet to be fixed
+
+2021/03/11
+  * 2048 game mechanics now complete
+  * Additional information window needs instructions on how to play added
+  * TermGame launcher has help features and requests commands on a loop until quit
+  * Yet to implement
+    * Instructions on how to play
+    * Additional games

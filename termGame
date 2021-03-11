@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+
+import sys
+
+termArguments = sys.argv
+firstCall = False
+
+if(len(termArguments) == 1):
+    termArguments.append("")
+
+while(termArguments[1] != "quit"):
+    if(termArguments[1] == "2048"):
+        with open("terminal2048/game.py", "rb") as source_file:
+            code = compile(source_file.read(), "terminal2048/game.py", "exec")
+        exec(code)
+        print("\n term was 2048\n")
+    elif(termArguments[1] == "help"):
+        print("\nUsage: ./termGame [argument]")
+        print("Optional arguments:")
+        print("2048\t:Launch 2048 game")
+        print("help\t:list termGame commands")
+        print("quit\t:Exit termGame launcher\n")
+    elif(termArguments[1] != ""):
+        print("\nCommand not recognised\n")
+
+    print("Please enter a game to play")
+    print("Use 'quit' to exit or 'help' for a list of games\n")
+    termArguments[1] = input("$ ")
