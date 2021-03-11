@@ -2,6 +2,7 @@ import math
 import time
 import random
 import curses
+import os.path
 from curses import wrapper
 
    #######   ######   #      #    ######
@@ -167,7 +168,7 @@ class Board:
         result[part] += "╝\n"
         return result
 
-def gameLoop(key, keys, won, pause, stdscr, info, boardSize, object):
+def gameLoop(key, keys, won, pause, stdscr, info, boardSize, object, hScore):
     while not str(key) in keys:
         key = stdscr.getkey()
     stdscr.clear()
@@ -220,10 +221,19 @@ def gameLoop(key, keys, won, pause, stdscr, info, boardSize, object):
     if(object.isGameOver):
         pause = True
         stdscr.addstr("GAME OVER\n", curses.A_BLINK)
-        stdscr.addstr("You Scored: " + str(object.score))
+        stdscr.addstr("You Scored: " + str(object.score) + '\n')
+        if(int(hScore)>int(object.score)):
+            stdscr.addstr("High Score: " + str(hScore) +'\n')
+        else :
+            stdscr.addstr("High Score: " + str(object.score) +'\n')
+            hScore = updateHScore(object.score)
         stdscr.addstr("\nPress 'R' to Restart")
     else :
-        stdscr.addstr("Your Score: " + str(object.score))
+        stdscr.addstr("Your Score: " + str(object.score) + '\n')
+        if(int(hScore)>int(object.score)):
+            stdscr.addstr("High Score: " + str(hScore) +'\n')
+        else :
+            stdscr.addstr("High Score: " + str(object.score) +'\n')
 
     if(object.getHighestVal() >= 2048 and not won):
         pause = True
@@ -235,7 +245,7 @@ def gameLoop(key, keys, won, pause, stdscr, info, boardSize, object):
         info.addstr("Use the ArrowKeys to slide the blocks\n")
         info.addstr("When blocks slide into each other,\nthey combine to double the value!\n\n")
         info.addstr("Try to reach 2048\n")
-        info.addstr("How far can you get?\n")
+        info.addstr("How far can you get?\n\n")
         info.addstr("Use the num keys 2-6 to change the size of the game\n")
         info.addstr("Use the 'R' key to reset\n")
         info.addstr("Use the 'Q' key to quit\n")
@@ -243,7 +253,7 @@ def gameLoop(key, keys, won, pause, stdscr, info, boardSize, object):
     info.refresh()
     if(key != "q"):
         key = "-1"
-    return key, object, info, pause, won, boardSize
+    return key, object, info, pause, won, boardSize, hScore
 
 def isAnInt(s):
     try:
@@ -257,9 +267,33 @@ curses.noecho()             #turn off echoing of keys to screen
 curses.cbreak()              #allow game to react to key presses without waiting for return key
 stdscr.keypad(True)         #cause special keys to be returned in curses format
 
+def readHScore():
+    result = [-1]
+    with open(os.path.join(os.path.dirname(__file__), 'HiScores.txt'), "r") as textFile:
+        lines = [line.split() for line in textFile]
+        result = lines[1][1]
+    return result
+
+def updateHScore(score):
+    with open(os.path.join(os.path.dirname(__file__), 'HiScores.txt'), "r") as textFile:
+        lines = [line.split() for line in textFile]
+        lines[1][1] = score
+        for i in range(len(lines)):
+            for j in range(len(lines[i])):
+                lines[i][j] = str(lines[i][j])
+        result = []
+        for i in range(len(lines)):
+            result.append(" ".join(lines[i]))
+        output = "\n".join(result)
+        with open(os.path.join(os.path.dirname(__file__), 'HiScores.txt'), "w") as textFile:
+            textFile.write(output)
+    return score
+
+
 def main(stdscr):           #main function is entry point to game
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    hScore = readHScore()
     # Clear screen
     stdscr.clear()
     boardSize = 4
@@ -271,7 +305,8 @@ def main(stdscr):           #main function is entry point to game
     stdscr.addstr(output[0], curses.color_pair(1))
     stdscr.addstr(output[1], curses.color_pair(2))
     stdscr.addstr(output[2], curses.color_pair(1))
-    stdscr.addstr("Your Score: " + str(object.score))
+    stdscr.addstr("Your Score: " + str(object.score) +'\n')
+    stdscr.addstr("High Score: " + str(hScore) +'\n')
 
     pause = False
     won = False
@@ -289,7 +324,7 @@ def main(stdscr):           #main function is entry point to game
     info.refresh()
     key = stdscr.getkey()
     while str(key) != "q":
-        key, object, info, pause, won, boardSize = gameLoop(key, keys, won, pause, stdscr, info, boardSize, object)
+        key, object, info, pause, won, boardSize, hScore = gameLoop(key, keys, won, pause, stdscr, info, boardSize, object, hScore)
 
 wrapper(main)               #wrapper catches exceptions, closes curses and then prints exceptions
 
