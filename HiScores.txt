@@ -1,6 +1,6 @@
 Game Score
 2048 7024
 Tetris 0
-Os&Xs 0
+Os&Xs 6
 Battleships 0
 2048 0
