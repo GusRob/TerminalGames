@@ -28,3 +28,11 @@ Simple games to play in the terminal
   * Yet to implement
     * Instructions on how to play
     * Additional games
+ 
+2021/03/12
+  * Os and Xs game engine fully implemented
+  * Basic opponent added that willplay wins and block losses where possible, does not compute any turns ahead
+  * Need to decide how to develop opponent algorithm, brief research gives two main options;
+    * Minimax algorithm, would be flexible if i decide to develop game further
+    * Newell and Simon's 1972 tic-tac-toe program rules, need to look into the reasoning for moves further but could be less memory intensive/more efficient
+  * Next game to implement in the meantime will be battleships
