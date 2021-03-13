@@ -6,13 +6,12 @@ import os.path
 from curses import wrapper
 from collections import Counter
 
-    ######    #       #     #   #
-   #    # #  #         #   #   #
-   #   #  #   #####     # #     #####
-   #  #   #  #           #     #
-   # #    #   #####     # #     #####
-   ##     #        #   #   #         #
-    ######    #####   #     #   #####
+#  ██████╗ ██╗  ██╗ ██████╗ ██╗  ██╗
+# ██╔═══██╗╚██╗██╔╝██╔═══██╗╚██╗██╔╝
+# ██║   ██║ ╚███╔╝ ██║   ██║ ╚███╔╝
+# ██║   ██║ ██╔██╗ ██║   ██║ ██╔██╗
+# ╚██████╔╝██╔╝ ██╗╚██████╔╝██╔╝ ██╗
+#  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝
 
    #*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*#
    # A simple command line board game in Python. #
@@ -77,7 +76,7 @@ class Board:
                         move = m
                         bestFound = True
                     stateTmp[m[0]][m[1]]  = " "
-            return move
+        return move
     def getEmpty(self, stateTmp):
         result = []
         for i in range(3):

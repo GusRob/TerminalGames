@@ -24,16 +24,22 @@ while(termArguments[1] != "quit"):
         with open("terminal2048/game.py", "rb") as source_file:
             code = compile(source_file.read(), "terminal2048/game.py", "exec")
         exec(code)
-    if(termArguments[1] == "OsXs"):
+    elif(termArguments[1] == "OsXs"):
         print("\nLaunching game : OsXs \n")
         with open("terminalOsXs/game.py", "rb") as source_file:
             code = compile(source_file.read(), "terminalOsXs/game.py", "exec")
+        exec(code)
+    elif(termArguments[1] == "ships"):
+        print("\nLaunching game : ships \n")
+        with open("terminalBattleShips/game.py", "rb") as source_file:
+            code = compile(source_file.read(), "terminalBattleShips/game.py", "exec")
         exec(code)
     elif(termArguments[1] == "help"):
         print("\nUsage: ./termGame [argument]")
         print("Optional arguments:\n")
         print('%12s'%"2048" + "\t:\tLaunch 2048 game")
         print('%12s'%"OsXs" + "\t:\tLaunch Os & Xs game")
+        print('%12s'%"ships" + "\t:\tLaunch battleships game")
         print('%12s'%"scores" + "\t:\tShow high scores for all games")
         print('%12s'%"help" + "\t:\tList termGame commands")
         print('%12s'%"quit" + "\t:\tExit termGame launcher\n")
