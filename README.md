@@ -6,6 +6,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 *  - [X] Noughts and Crosses
 *  - [ ] Tetris
 *  - [X] Battleships
+*  - [ ] Snake
 
 #### Opponents
 *  - [ ] Noughts and Crosses
