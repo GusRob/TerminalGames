@@ -3,8 +3,12 @@ Simple games to play in the terminal
 
 ## This repository will consist of a series of Terminal minigames
 *  - [X] 2048 block sliding game
-*  - [ ] Noughts and Crosses
+*  - [X] Noughts and Crosses
 *  - [ ] Tetris
+*  - [X] Battleships
+
+###Opponents
+*  - [ ] Noughts and Crosses
 *  - [ ] Battleships
 
 ## Usage Instructions
