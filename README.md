@@ -1,5 +1,5 @@
 # TerminalGames
-Simple games to play in the terminal
+Simple games to play in the terminal using the 'curses' screen and keyboard handling library in python
 
 ## This repository will consist of a series of Terminal minigames
 *  - [X] 2048 block sliding game
