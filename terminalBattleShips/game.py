@@ -22,21 +22,85 @@ from collections import Counter
 
 class Board:
     def __init__(self, size):
-        self.size = size
-        self.state = [[["≈" for i in range(size)] for j in range(size)], [["≈" for i in range(size)] for j in range(size)]]
+        self.size = size  #playershots playerships enemyships enemyshots
+        self.state = [[["≈" for i in range(size)] for j in range(size)], [["≈" for i in range(size)] for j in range(size)], [["≈" for n in range(size)] for j in range(size)], [["≈" for n in range(size)] for j in range(size)]]
         self.score = 0
         self.mode = "placing"
-        self.held = 5
+        self.ships = [5, 4, 3, 3, 2]
+        self.pShips = []
+        self.cShips = [] # size orient location isSunk
+        self.held = 0
         self.heldO = 0
-        self.valid = False
-        self.selected = [1,1]
-        self.shipSigns = ["⌖ ", "▲ ", "▶ ", "▼ ", "◀ ", "■ ", "◌ ", "≈ "]
+        self.valid = True
+        self.pWinner = None
+        self.selected = [0,0]
+        #self.shipSigns = ["⦻ ", "▲ ", "▶ ", "▼ ", "◀ ", "■ ", "◎ ", "≈ "]
+    def cpuShoot(self):
+        empties = []
+        for i in range(self.size):
+            for j in range(self.size):
+                if(self.state[3][j][i] ==  "≈"):
+                    empties.append([j,i])
+        result = empties[random.randint(0, len(empties)-1)]
+        self.makeShot(result, False)
+        return
+    def checkWinners(self, player):
+        hits = 0
+        for i in range(self.size):
+            for j in range(self.size):
+                if(self.state[0 if player else 3][j][i] in ["▲", "▶", "▼", "◀", "■", "⦻"]):
+                    hits+=1
+        if(hits == sum(self.ships)):
+            self.pWinner = player
+        return
+    def makeShot(self, shot, player):
+        result =  self.state[2 if player else 1][shot[0]][shot[1]]
+        target = self.state[0 if player else 3][shot[0]][shot[1]]
+        if( target == "≈"):
+            if result in ["▲", "▶", "▼", "◀", "■"]:
+                if(player):
+                    self.score += 1
+                else:
+                    self.score -= 1
+                self.state[0 if player else 3][shot[0]][shot[1]] = "⦻"
+                for n in range(len(self.cShips)):
+                    ship = self.cShips[n]
+                    if(not ship[3]):
+                        sunk = True
+                        shipSqs = []
+                        xDir = 1 if (ship[1] == 0) else (-1 if (ship[1] == 2) else 0)
+                        yDir = 1 if (ship[1] == 1) else (-1 if (ship[1] == 3) else 0)
+                        for a in range(ship[0]):
+                            if not (self.state[0 if player else 3][ship[2][0] + xDir*a][ship[2][1] + yDir*a] == "⦻"):
+                                sunk = False
+                            shipSqs.append([ship[2][0] + xDir*a, ship[2][1] + yDir*a])
+                        if sunk:
+                            if(player):
+                                self.score += 8-ship[0]
+                            else:
+                                self.score -= 10-ship[0]
+                            for i in range(ship[0]):
+                                part = shipSqs[i]
+                                ends = ["▶", "▼", "◀", "▲"]
+                                starts = ["◀", "▲", "▶", "▼"]
+                                if(i == 0):
+                                    self.state[0 if player else 3][part[0]][part[1]] = starts[ship[1]]
+                                elif(i == ship[0]-1):
+                                    self.state[0 if player else 3][part[0]][part[1]] = ends[ship[1]]
+                                else:
+                                    self.state[0 if player else 3][part[0]][part[1]] = "■"
+            else:
+                self.state[0 if player else 3][shot[0]][shot[1]] = "◎"
+            self.checkWinners(player)
+            return True
+        else:
+            return False
     def __str__(self, stdscr):
-        falses = [False, False, False, False, False]
+        falses = [False, False, False, False]
         drawVal(stdscr, "Your Targets: " + "Your Ships:".rjust(self.size * 2 + 1) + "\n╔", falses)
         for i in range(self.size * 2 + 1):
             drawVal(stdscr, "═", falses)
-        drawVal(stdscr, "╗\t╔", falses)
+        drawVal(stdscr, "╗ ╔", falses)
         for i in range(self.size * 2 + 1):
             drawVal(stdscr, "═", falses)
         drawVal(stdscr, "╗\n", falses)
@@ -44,44 +108,78 @@ class Board:
             drawVal(stdscr, "║ ", falses)
             for j in range(self.size):
                 if self.selected[0] == j and self.selected[1] == i and self.mode != "placing":
-                    drawVal(stdscr, self.state[0][j][i] + " ", [True, False, False, False, False])
+                    drawVal(stdscr, self.state[0][j][i] + " ", [True, False, False, False])
                 else:
-                    drawVal(stdscr, self.state[0][j][i] + " ", falses)
-            drawVal(stdscr, "║\t║ ", falses)
+                    if(self.state[0][j][i] in ["▲", "▶", "▼", "◀", "■"]):
+                        drawVal(stdscr, self.state[0][j][i] + " ", [False, False, False, True])
+                    else:
+                        drawVal(stdscr, self.state[0][j][i] + " ", falses)
+            drawVal(stdscr, "║ ║ ", falses)
             for j in range(self.size):
                 if(self.mode == "placing"):
                     ship = []
                     xDir = 1 if (self.heldO == 0) else (-1 if (self.heldO == 2) else 0)
                     yDir = 1 if (self.heldO == 1) else (-1 if (self.heldO == 3) else 0)
-                    for n in range(self.held):
+                    for n in range(self.ships[self.held]):
                         ship.append([self.selected[0] + xDir*n, self.selected[1] + yDir*n])
                     if [j,i] in ship:
                         ends = ["▶ ", "▼ ", "◀ ", "▲ "]
                         starts = ["◀ ", "▲ ", "▶ ", "▼ "]
                         if(ship.index([j,i]) == 0):
-                            drawVal(stdscr, starts[self.heldO], [True, False, False, True, self.valid])
+                            drawVal(stdscr, starts[self.heldO], [True, True, self.valid, False])
                         elif(ship.index([j,i]) == len(ship)-1):
-                            drawVal(stdscr, ends[self.heldO], [True, False, False, True, self.valid])
+                            drawVal(stdscr, ends[self.heldO], [True, True, self.valid, False])
                         else:
-                            drawVal(stdscr, "■ ", [True, False, False, True, self.valid])
+                            drawVal(stdscr, "■ ", [True, True, self.valid, False])
                     else:
                         drawVal(stdscr, self.state[1][j][i] + " ", falses)
                 else:
-                    drawVal(stdscr, self.state[1][j][i] + " ", falses)
+                    hit = self.state[3][j][i] in ["⦻", "▲", "▶", "▼", "◀", "■", "◎"]
+                    if(hit):
+                        if(self.state[3][j][i] == "◎"):
+                            drawVal(stdscr, self.state[3][j][i] + " ", [False, False, False, True])
+                        else:
+                            drawVal(stdscr, self.state[1][j][i] + " ", [False, False, False, True])
+                    else:
+                        drawVal(stdscr, self.state[1][j][i] + " ", falses)
             drawVal(stdscr, "║\n", falses)
         drawVal(stdscr, "╚", falses)
         for i in range(self.size * 2 +1):
             drawVal(stdscr, "═", falses)
-        drawVal(stdscr, "╝\t╚", falses)
+        drawVal(stdscr, "╝ ╚", falses)
         for i in range(self.size * 2 +1):
             drawVal(stdscr, "═", falses)
         drawVal(stdscr, "╝\n", falses)
         return
+    def placeComputerShips(self):
+        for n in range(len(self.ships)):
+            valid = False
+            while not valid:
+                cpuHeldO = random.randint(0, 3)
+                cpuSelected = [random.randint(0, self.size-1),random.randint(0, self.size-1)]
+                ship = []
+                xDir = 1 if (cpuHeldO == 0) else (-1 if (cpuHeldO == 2) else 0)
+                yDir = 1 if (cpuHeldO == 1) else (-1 if (cpuHeldO == 3) else 0)
+                for a in range(self.ships[n]):
+                    ship.append([cpuSelected[0] + xDir*a, cpuSelected[1] + yDir*a])
+                valid = checkValid(self.state[2], ship)
+            for i in range(len(ship)):
+                part = ship[i]
+                ends = ["▶", "▼", "◀", "▲"]
+                starts = ["◀", "▲", "▶", "▼"]
+                if(i == 0):
+                    self.state[2][part[0]][part[1]] = starts[cpuHeldO]
+                elif(i == len(ship)-1):
+                    self.state[2][part[0]][part[1]] = ends[cpuHeldO]
+                else:
+                    self.state[2][part[0]][part[1]] = "■"
+            self.cShips.append([self.ships[n], cpuHeldO, cpuSelected, False])
+
     def placeHeld(self):
         ship = []
         xDir = 1 if (self.heldO == 0) else (-1 if (self.heldO == 2) else 0)
         yDir = 1 if (self.heldO == 1) else (-1 if (self.heldO == 3) else 0)
-        for n in range(self.held):
+        for n in range(self.ships[self.held]):
             ship.append([self.selected[0] + xDir*n, self.selected[1] + yDir*n])
         for i in range(len(ship)):
             part = ship[i]
@@ -93,47 +191,55 @@ class Board:
                 self.state[1][part[0]][part[1]] = ends[self.heldO]
             else:
                 self.state[1][part[0]][part[1]] = "■"
-        self.held = self.held-1 if (self.held != 2) else 2
+        self.pShips.append([self.held, self.heldO, self.selected, False])
+        if self.held < len(self.ships)-1:
+            self.held = self.held + 1
+        else:
+            self.mode = "playing"
+            self.placeComputerShips()
         self.selected = [0,0]
+        self.updateValid()
     def updateValid(self):
-        result = True
         ship = []
         xDir = 1 if (self.heldO == 0) else (-1 if (self.heldO == 2) else 0)
         yDir = 1 if (self.heldO == 1) else (-1 if (self.heldO == 3) else 0)
-        for n in range(self.held):
+        for n in range(self.ships[self.held]):
             ship.append([self.selected[0] + xDir*n, self.selected[1] + yDir*n])
-        for i in range(len(ship)):
-            part = ship[i]
-            if(part[0] <= -1 or part[0] >= self.size or part[1] <= -1 or part[1] >= self.size):
-                result = False
-            elif self.state[1][part[0]][part[1]] in ["▲", "▶", "▼", "◀", "■"]:
-                result = False
-        self.valid = result
+        self.valid = checkValid(self.state[1], ship)
 
+def checkValid(state, ship):
+    result = True
+    size = len(state[0])
+    for i in range(len(ship)):
+        part = ship[i]
+        if(part[0] <= -1 or part[0] >= size or part[1] <= -1 or part[1] >= size):
+            result = False
+        elif state[part[0]][part[1]] in ["▲", "▶", "▼", "◀", "■"]:
+            result = False
+    return result
 
-def drawVal(stdscr, val, bools): # w r g b
-    selected, hit, sunk, placing, valid = bools
+def drawVal(stdscr, val, bools): # w r g b c y
+    selected, placing, valid, sunk = bools
+    col = curses.color_pair(1)
     if placing:
         if valid:
-            stdscr.addstr(val, curses.color_pair(3))
+            col = curses.color_pair(3)
         else :
-            stdscr.addstr(val, curses.color_pair(2))
-    elif selected:
-        if val in ["⌖ ", "▲ ", "▶ ", "▼ ", "◀ ", "■ "]:
-            stdscr.addstr(val, curses.color_pair(2))
-        else :
-            stdscr.addstr(val, curses.color_pair(3))
-    elif hit:
-        stdscr.addstr(val, curses.color_pair(1))
-    elif sunk:
-        stdscr.addstr(val, curses.color_pair(2))
-    elif val == "≈ ":
-        stdscr.addstr(val, curses.color_pair(4))
-    elif val == "◌ ":
-        stdscr.addstr(val, curses.color_pair(4))
+            col = curses.color_pair(2)
     else:
-        stdscr.addstr(val, curses.color_pair(1))
-
+        if val == "⦻ ":
+            col = curses.color_pair(2)
+        elif val == "≈ ":
+            col = curses.color_pair(4)
+        elif val == "◎ ":
+            col = curses.color_pair(5)
+        else:
+            col = curses.color_pair(1)
+        if selected:
+            col = curses.color_pair(1)
+        if sunk and not val == "◎ ":
+            col = curses.color_pair(2)
+    stdscr.addstr(val, col)
 
 def isAnInt(s):
     try:
@@ -204,32 +310,70 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore, boardSize):
     elif(key == "\n" and not pause):
         if object.mode == "placing" and object.valid:
             object.placeHeld()
-        object.updateValid()
+        elif object.mode == "playing":
+            success = object.makeShot(object.selected, True)
+            if(success):
+                object.cpuShoot()
+        else:
+            object.updateValid()
     elif(key == "r" or key=="s" or key=="m" or key=="l"):
+        x = object.size * 2 + 30
         if key == "s":
-            boardSize = 7
+            boardSize = 8
         elif key == "m":
             boardSize = 10
         elif key == "l":
-            boardSize = 13
+            boardSize = 12
         object = Board(boardSize)
         pause = False
+        x = object.size * 2 + 32
+        rows, cols = stdscr.getmaxyx()
+        info = curses.newwin(25, cols-x, 0, x)
     object.__str__(stdscr)
+    info.clear()
+    info.addstr(getInfo(object))
+    if(object.pWinner != None):
+        pause = True
+        if(object.score > int(hScore)):
+            updateHScore(object.score)
+            hScore = object.score
     stdscr.addstr("\n\nYour Score: " + str(object.score) +'\n')
     stdscr.addstr("High Score: " + str(hScore) +'\n')
-    info.clear()
     stdscr.refresh()
     info.refresh()
 
     if(key != "q"):
         key = "-1"
-    return key, object, pause, hScore, boardSize
+    return key, object, pause, hScore, boardSize, info
+
+def getInfo(object):
+    result = "Welcome to BattleShips!\n"
+    if(object.pWinner == None):
+        if(object.mode == "placing"):
+            result += "Place your ships!\n"
+            result += "Use Arrowkeys to move\n"
+            result += "Use Space to Rotate\n"
+            result += "Use Return to confirm\n"
+        else :
+            result += "Choose your target!\n"
+            result += "Use Arrowkeys to move\n"
+            result += "Use Return to confirm\n"
+    else:
+        result += "\nYou " + ("Win!\n" if object.pWinner else "Lose!\n")
+    result += "\nUse the 'R' key to reset\n"
+    result += "Use the 'Q' key to quit\n"
+    result += "Use the 'S','M' and 'L' keys\n"
+    result += "to change the size of the board\n"
+
+    return result
 
 def main(stdscr):           #main function is entry point to game
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    curses.init_pair(5, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(6, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     hScore = readHScore()
     # Clear screen
     stdscr.clear()
@@ -237,17 +381,18 @@ def main(stdscr):           #main function is entry point to game
     object = Board(boardSize)
     object.__str__(stdscr)
     rows, cols = stdscr.getmaxyx()
-    x = 20
-    info = curses.newwin(25, cols-x, 0, x+50)
+    x = object.size * 2 + 30
+    info = curses.newwin(25, cols-x, 0, x)
 
     pause = False
     keys = ["KEY_UP", "KEY_DOWN", "KEY_LEFT", "KEY_RIGHT", " ", "\n", "q", "r", "s", "m", "l"]
     info.clear()
+    info.addstr(getInfo(object))
     stdscr.refresh()
     info.refresh()
     key = stdscr.getkey()
     while str(key) != "q":
-        key, object, pause, hScore, boardSize = gameLoop(stdscr, info, key, keys, object, pause, hScore, boardSize)
+        key, object, pause, hScore, boardSize, info = gameLoop(stdscr, info, key, keys, object, pause, hScore, boardSize)
 
 wrapper(main)               #wrapper catches exceptions, closes curses and then prints exceptions
 
