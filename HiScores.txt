@@ -2,5 +2,5 @@ Game Score
 2048 7024
 Tetris 0
 Os&Xs 6
-Battleships 30
-Snake 15
+Battleships 33
+Snake 24

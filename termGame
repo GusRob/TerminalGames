@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 
 
-commands = ["2048", "OsXs", "ships", "snake"]
-out = ["2048", "OsXs", "BattleShips", "Snake"]
+commands = ["2048", "OsXs", "ships", "snake", "tetris"]
+out = ["2048", "OsXs", "BattleShips", "Snake", "Tetris"]
 
 
 def readHScores():
@@ -18,8 +19,15 @@ def readHScores():
 termArguments = sys.argv
 firstCall = False
 
+
+
 if(len(termArguments) == 1):
     termArguments.append("")
+
+if(termArguments[1].startswith("--")):
+    termArguments[1] = termArguments[1][2:]
+
+prevCommand = termArguments[1]
 
 while(termArguments[1] != "quit"):
     if(termArguments[1] in commands):
@@ -34,6 +42,7 @@ while(termArguments[1] != "quit"):
         print('%12s'%"2048" + "\t:\tLaunch 2048 game")
         print('%12s'%"OsXs" + "\t:\tLaunch Os & Xs game")
         print('%12s'%"ships" + "\t:\tLaunch battleships game")
+        print('%12s'%"snake" + "\t:\tLaunch snake game")
         print('%12s'%"scores" + "\t:\tShow high scores for all games")
         print('%12s'%"help" + "\t:\tList termGame commands")
         print('%12s'%"quit" + "\t:\tExit termGame launcher\n")
@@ -59,4 +68,8 @@ while(termArguments[1] != "quit"):
 
     print("\n\nPlease enter a command")
     print("Use 'quit' to exit or 'help' for a list of games\n")
+    width = os.get_terminal_size().columns
+    print("─"* width)
     termArguments[1] = input("~~~ ")
+    print("─"* width)
+    prevCommand = termArguments[1]

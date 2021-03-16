@@ -15,6 +15,10 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 ## Usage Instructions
 
   * To run the minigame interface, the 'termGame' file can be executed as any other executable file with the name of the game to play as an argument due to it's shebang addition, allowing the user to call, for example './termGame 2048' to launch the 2048 game
+  * The CLI can be run without arguments, with the name of the game as an argument, or the name of the game as an optional argument flag
+    * ```./termGame```
+    * ```./termGame snake```
+    * ```./termGame --snake```
   * To exit games and return to the termGame CLI, the user should press the 'Q' key and to run games from within the CLI, the user only needs to type the name of the game and press return
   * To exit the CLI, the user should run the command 'quit'
   * For a full list of commands, the user should run the command 'help'
@@ -33,7 +37,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
   * Yet to implement
     * Instructions on how to play
     * Additional games
- 
+
 2021/03/12
   * Os and Xs game engine fully implemented
   * Basic opponent added that will play wins and block losses where possible, does not compute any turns ahead
@@ -41,7 +45,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
     * Minimax algorithm, would be flexible if i decide to develop game further
     * Newell and Simon's 1972 tic-tac-toe program rules, need to look into the reasoning for moves further but could be less memory intensive/more efficient
   * Next game to implement in the meantime will be battleships
- 
+
  2021/03/13
   * Battleships game engine completely implemented
   * Basic opponent added that will shoot randomly always

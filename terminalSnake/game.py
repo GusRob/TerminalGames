@@ -25,7 +25,7 @@ from collections import Counter
 class Board:
     def __init__(self):
         self.hPos = [6,6]
-        self.bPos = [self.hPos[:], self.hPos[:], self.hPos[:]]
+        self.bPos = [[6,4], [6,5], [6,6]]
         empties = self.getEmpty()
         self.fPos = empties[random.randint(0, len(empties))]
         self.score = 0
@@ -103,7 +103,10 @@ class Board:
                     else:
                         stdscr.addstr("● ", curses.color_pair(3))
                 elif [i,j] == self.fPos:
-                    stdscr.addstr(" ", curses.color_pair(2))
+                    if(self.gameOver):
+                        stdscr.addstr(" ", curses.color_pair(2) | curses.A_BLINK)
+                    else:
+                        stdscr.addstr(" ", curses.color_pair(2))
                 else:
                    stdscr.addstr("  ", curses.color_pair(3))
 
@@ -238,28 +241,8 @@ def main(stdscr):           #main function is entry point to game
     rows, cols = stdscr.getmaxyx()
     x = 40
     info = curses.newwin(rows, 35, 0, x)
-    object.__str__(stdscr)
-
-    if object.score > int(hScore):
-        updateHScore(object.score)
-        hScore = readHScore()
-
     pause = True
     keys = [curses.KEY_UP, curses.KEY_DOWN, curses.KEY_LEFT, curses.KEY_RIGHT, curses.KEY_ENTER, ord('q'), ord('r'), ord('i')]
-
-    stdscr.addstr("\n\nYour Score: " + str(object.score) +'\n')
-    stdscr.addstr("High Score: " + str(hScore) +'\n')
-    info.clear()
-    info.addstr("Instructions:\n")
-    info.addstr("Use the ArrowKeys to move\n")
-    info.addstr("Eat the food to Grow!\n")
-    info.addstr("Can you grow the largest?\n\n")
-    info.addstr("Walls are currently \n" + ("infinite\n" if not object.solidWalls else "solid\n"))
-    info.addstr("\nUse the 'I' key to \n" + ("make walls infinite\n" if object.solidWalls else "make walls solid\n"))
-    info.addstr("Use the 'R' key to reset\n")
-    info.addstr("Use the 'Q' key to quit\n")
-    stdscr.refresh()
-    info.refresh()
     key = -1
 
     while key != ord('q'):
