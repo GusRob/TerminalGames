@@ -1,10 +1,15 @@
 # TerminalGames
-Simple games to play in the terminal
+Simple games to play in the terminal using the 'curses' screen and keyboard handling library in python
 
 ## This repository will consist of a series of Terminal minigames
 *  - [X] 2048 block sliding game
-*  - [ ] Noughts and Crosses
+*  - [X] Noughts and Crosses
 *  - [ ] Tetris
+*  - [X] Battleships
+*  - [ ] Snake
+
+#### Opponents
+*  - [ ] Noughts and Crosses
 *  - [ ] Battleships
 
 ## Usage Instructions
@@ -31,8 +36,17 @@ Simple games to play in the terminal
  
 2021/03/12
   * Os and Xs game engine fully implemented
-  * Basic opponent added that willplay wins and block losses where possible, does not compute any turns ahead
+  * Basic opponent added that will play wins and block losses where possible, does not compute any turns ahead
   * Need to decide how to develop opponent algorithm, brief research gives two main options;
     * Minimax algorithm, would be flexible if i decide to develop game further
     * Newell and Simon's 1972 tic-tac-toe program rules, need to look into the reasoning for moves further but could be less memory intensive/more efficient
   * Next game to implement in the meantime will be battleships
+ 
+ 2021/03/13
+  * Battleships game engine completely implemented
+  * Basic opponent added that will shoot randomly always
+  * Next steps to develop the battleship opponent algorithm
+    * Once bot scores a hit, they should change strategy and start shooting round the hit
+    * When searching for initial hit, attack grid in a checkered mask in order to reduce useless shots
+    * A more advanced algorithm could map a probability calculating function to every square on the board in order to choose squares with most possible ship placements over them
+  * Next game to implement in the meantime will be tetris
