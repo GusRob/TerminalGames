@@ -17,7 +17,7 @@ from collections import Counter
 
 
    #*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*#
-   # A simple command line board game in Python. #
+   # A simple command line block game in Python. #
    #*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*#
 
 ########################################################
@@ -32,6 +32,12 @@ class Board:
         self.score = 0
         self.newHigh = False
     def move(self):
+        return
+    def fall(self):
+        return
+    def drop(self):
+        return
+    def rotate(self):
         return
     def deleteRow(self):
         return

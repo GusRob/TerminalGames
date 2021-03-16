@@ -15,6 +15,12 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 
 ## Usage Instructions
 
+#### Executable file
+
+  * [MACOS ONLY] The standalone executable is located in the folder 'TerminalGames/dist' and can be run from a graphical file explorer by opening, which should open a terminal with the CLI running
+  
+#### Run from command line
+
   * To run the minigame interface, the 'termGame' file can be executed as any other executable file with the name of the game to play as an argument due to it's shebang addition, allowing the user to call, for example './termGame 2048' to launch the 2048 game
   * The CLI can be run without arguments, with the name of the game as an argument, or the name of the game as an optional argument flag
     * ```./termGame```
@@ -62,3 +68,4 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
   * Instead of the game waiting for a keypress and then state updating, the game runs a loop every 0.05 seconds
   * A move counter increments to keep track of the game speed
   * The only problem with this approach is that if the computer runs slowly, e.g. th computer is processor has lots of background tasks, then the game will slow down rapidly, as the state will not update asynchronously
+  * Also used pyInstaller to create a single application file for ease of running

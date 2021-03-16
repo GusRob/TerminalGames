@@ -16,7 +16,7 @@ from collections import Counter
 # ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
 
    #*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*#
-   # A simple command line board game in Python. #
+   # A simple command line snake game in Python. #
    #*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*#
 
 ########################################################
