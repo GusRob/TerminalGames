@@ -3,6 +3,9 @@
 import sys
 
 
+commands = ["2048", "OsXs", "ships", "snake"]
+out = ["2048", "OsXs", "BattleShips", "Snake"]
+
 
 def readHScores():
     result = ["error"]
@@ -19,20 +22,11 @@ if(len(termArguments) == 1):
     termArguments.append("")
 
 while(termArguments[1] != "quit"):
-    if(termArguments[1] == "2048"):
-        print("\nLaunching game : 2048 \n")
-        with open("terminal2048/game.py", "rb") as source_file:
-            code = compile(source_file.read(), "terminal2048/game.py", "exec")
-        exec(code)
-    elif(termArguments[1] == "OsXs"):
-        print("\nLaunching game : OsXs \n")
-        with open("terminalOsXs/game.py", "rb") as source_file:
-            code = compile(source_file.read(), "terminalOsXs/game.py", "exec")
-        exec(code)
-    elif(termArguments[1] == "ships"):
-        print("\nLaunching game : ships \n")
-        with open("terminalBattleShips/game.py", "rb") as source_file:
-            code = compile(source_file.read(), "terminalBattleShips/game.py", "exec")
+    if(termArguments[1] in commands):
+        index = commands.index(termArguments[1])
+        print("\nLaunching game : " + out[index] + " \n")
+        with open("terminal" + out[index] + "/game.py", "rb") as source_file:
+            code = compile(source_file.read(), "terminal" + out[index] + "/game.py", "exec")
         exec(code)
     elif(termArguments[1] == "help"):
         print("\nUsage: ./termGame [argument]")
