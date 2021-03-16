@@ -6,7 +6,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 *  - [X] Noughts and Crosses
 *  - [ ] Tetris
 *  - [X] Battleships
-*  - [ ] Snake
+*  - [X] Snake
 
 #### Opponents
 *  - [ ] Noughts and Crosses
@@ -54,3 +54,10 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
     * When searching for initial hit, attack grid in a checkered mask in order to reduce useless shots
     * A more advanced algorithm could map a probability calculating function to every square on the board in order to choose squares with most possible ship placements over them
   * Next game to implement in the meantime will be tetris
+
+2021/03/16
+  * Snake game implemented
+  * Chose to implement this before the tetris game, as it is simpler and adjusting the previous game format to use a timer was easier with this game
+  * Instead of the game waiting for a keypress and then state updating, the game runs a loop every 0.05 seconds
+  * A move counter increments to keep track of the game speed
+  * The only problem with this approach is that if the computer runs slowly, e.g. th computer is processor has lots of background tasks, then the game will slow down rapidly, as the state will not update asynchronously
