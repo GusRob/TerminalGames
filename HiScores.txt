@@ -4,3 +4,4 @@ Tetris 0
 Os&Xs 6
 Battleships 33
 Snake 24
+Greed 54

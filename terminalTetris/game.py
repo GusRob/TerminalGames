@@ -25,12 +25,14 @@ from collections import Counter
 
 class Board:
     def __init__(self):
-        self.state = [[" " for i in range(6)] for j in range(12)]
+        self.state = [[0 for i in range(7)] for j in range(12)]
         self.gameOver = False
         self.moveCounter = 0
         self.speed = 0
         self.score = 0
         self.newHigh = False
+        self.next = 0
+        self.saved = 0
     def move(self):
         return
     def fall(self):
@@ -42,6 +44,16 @@ class Board:
     def deleteRow(self):
         return
     def __str__(self, stdscr):
+        nextWin = ["╔════════╗", "║        ║","║        ║","║        ║","╚════════╝", "", "", " Held:", "╔════════╗","║        ║","║        ║", "║        ║"]
+        stdscr.addstr("╔══════════════╗ Next:\n")
+        for i in range(len(self.state)):
+            stdscr.addstr("║")
+            for j in range(len(self.state[0])):
+                stdscr.addstr(self.state[i][j])
+            addition = nextWin[i]
+            stdscr.addstr("║" + addition + "\n")
+        stdscr.addstr("╚══════════════╝╚════════╝\n")
+
         return
 
 random.seed()
@@ -55,13 +67,13 @@ def readHScore():
     result = [-1]
     with open(os.path.join(os.path.dirname(__file__), 'HiScores.txt'), "r") as textFile:
         lines = [line.split() for line in textFile]
-        result = lines[5][1]
+        result = lines[2][1]
     return result
 
 def updateHScore(score):
     with open(os.path.join(os.path.dirname(__file__), 'HiScores.txt'), "r") as textFile:
         lines = [line.split() for line in textFile]
-        lines[5][1] = score
+        lines[2][1] = score
         for i in range(len(lines)):
             for j in range(len(lines[i])):
                 lines[i][j] = str(lines[i][j])

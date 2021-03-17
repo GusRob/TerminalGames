@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import sys
+import sys #build with pyInstaller termGame --onefile
 import os
 
 
-commands = ["2048", "OsXs", "ships", "snake", "tetris"]
-out = ["2048", "OsXs", "BattleShips", "Snake", "Tetris"]
+commands = ["2048", "OsXs", "ships", "snake", "tetris", "greed"]
+out = ["2048", "OsXs", "BattleShips", "Snake", "Tetris", "Greed"]
 
 
 def readHScores():
@@ -31,10 +31,12 @@ prevCommand = termArguments[1]
 
 while(termArguments[1] != "quit"):
     if(termArguments[1] in commands):
+        currentPath = os.path.abspath(os.path.dirname(__file__))
         index = commands.index(termArguments[1])
         print("\nLaunching game : " + out[index] + " \n")
-        with open("terminal" + out[index] + "/game.py", "rb") as source_file:
-            code = compile(source_file.read(), "terminal" + out[index] + "/game.py", "exec")
+        fileName = currentPath + "/terminal" + out[index] + "/game.py"
+        with open(fileName, "rb") as source_file:
+            code = compile(source_file.read(), fileName, "exec")
         exec(code)
     elif(termArguments[1] == "help"):
         print("\nUsage: ./termGame [argument]")
