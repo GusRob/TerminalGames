@@ -7,7 +7,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 *  - [ ] Tetris
 *  - [X] Battleships
 *  - [X] Snake
-*  - [ ] Greed
+*  - [X] Greed
 
 #### Opponents
 *  - [ ] Noughts and Crosses
@@ -69,3 +69,10 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
   * A move counter increments to keep track of the game speed
   * The only problem with this approach is that if the computer runs slowly, e.g. th computer is processor has lots of background tasks, then the game will slow down rapidly, as the state will not update asynchronously
   * Also used pyInstaller to create a single application file for ease of running
+
+2021/03/17
+  * Greed game implemented
+  * Simple game, new rules for snake basically
+  * User moves a 'snake' around a grid of numbers without a clock/auto moving
+  * When moving in one direction the snake moves as far as the first digit it comes across dictates
+  * The user loses when going into themselves or off the board
