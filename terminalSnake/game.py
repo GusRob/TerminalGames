@@ -27,7 +27,7 @@ class Board:
         self.hPos = [6,6]
         self.bPos = [[6,4], [6,5], [6,6]]
         empties = self.getEmpty()
-        self.fPos = empties[random.randint(0, len(empties))]
+        self.fPos = empties[random.randint(0, len(empties)-1)]
         self.score = 0
         self.gameOver = False
         self.dir = 0
@@ -70,7 +70,7 @@ class Board:
             self.hPos = newHPos
             if self.hPos == self.fPos :
                 empties = self.getEmpty()
-                self.fPos = empties[random.randint(0, len(empties))]
+                self.fPos = empties[random.randint(0, len(empties)-1)]
                 self.speed = 10-int(len(self.bPos)/2)
                 if(self.speed < 2):
                     self.speed = 2
@@ -128,7 +128,6 @@ curses.noecho()             #turn off echoing of keys to screen
 curses.cbreak()              #allow game to react to key presses without waiting for return key
 stdscr.keypad(True)         #cause special keys to be returned in curses format
 stdscr.nodelay(True)         #game doesnt wait for user to press a key
-clock = pygame.time.Clock()
 
 def readHScore():
     result = [-1]
@@ -252,6 +251,7 @@ wrapper(main)               #wrapper catches exceptions, closes curses and then 
 
 
 curses.nocbreak()           #terminate curses commands
+stdscr.nodelay(False)        
 stdscr.keypad(False)
 curses.echo()
 curses.endwin()

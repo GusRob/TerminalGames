@@ -2,15 +2,25 @@
 
 import sys #build with pyInstaller termGame --onefile
 import os
+from prompt_toolkit import prompt
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.completion import WordCompleter
+
 
 
 commands = ["2048", "OsXs", "ships", "snake", "tetris", "greed"]
 out = ["2048", "OsXs", "BattleShips", "Snake", "Tetris", "Greed"]
 
+commandPrompts = commands[:]
+commandPrompts.append("help")
+commandPrompts.append("quit")
+
+CompleterList = WordCompleter(commandPrompts)
 
 def readHScores():
-    result = ["error"]
-    with open('HiScores.txt', "r") as textFile:
+    currentPath = os.path.abspath(os.path.dirname(__file__))
+    with open(currentPath + '/HiScores.txt', "r") as textFile:
         lines = [line.split() for line in textFile]
     return lines
 
@@ -26,8 +36,6 @@ if(len(termArguments) == 1):
 
 if(termArguments[1].startswith("--")):
     termArguments[1] = termArguments[1][2:]
-
-prevCommand = termArguments[1]
 
 while(termArguments[1] != "quit"):
     if(termArguments[1] in commands):
@@ -72,6 +80,9 @@ while(termArguments[1] != "quit"):
     print("Use 'quit' to exit or 'help' for a list of games\n")
     width = os.get_terminal_size().columns
     print("─"* width)
-    termArguments[1] = input("~~~ ")
+    termArguments[1] = prompt('~~~',
+                        history=FileHistory(os.path.abspath(os.path.dirname(__file__)) + '/.termGame_history'),
+                        auto_suggest=AutoSuggestFromHistory(),
+                        #completer=CompleterList,
+                        )
     print("─"* width)
-    prevCommand = termArguments[1]

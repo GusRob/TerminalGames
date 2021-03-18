@@ -92,7 +92,7 @@ class Board:
                     else:
                         stdscr.addstr(str(val), curses.color_pair(val))
                 elif not self.selecting:
-                    stdscr.addstr(" ", curses.color_pair(10))
+                    stdscr.addstr("§", curses.color_pair(12) | curses.A_BLINK)
                 else:
                     stdscr.addstr(str(val), curses.color_pair(10))
                 if(([j,i] == self.selected and [j+1,i] == self.neck) or ([j+1,i] == self.selected and [j,i] == self.neck)):
