@@ -34,6 +34,8 @@ class Board:
         self.moveCounter = 0
         self.speed = 8
         self.dirChanged = False
+        self.nextDir = -1
+        self.lastDir = -1
         self.death = 225
         self.newHigh = False
         self.solidWalls = True
@@ -78,6 +80,10 @@ class Board:
             else :
                 self.bPos.pop(0)
             self.dirChanged = False
+            self.lastDir = self.dir
+            if(self.nextDir != -1):
+                self.dir = self.nextDir
+                self.nextDir = -1
     def getEmpty(self):
         result = []
         for i in range(15):
@@ -158,22 +164,34 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore):
     if pause and key != -1 and not object.gameOver:
         pause = False
 
-    if(key == curses.KEY_UP and (not pause) and (not object.dirChanged)):
-        if object.dir != 1:
-            object.dir = 3
-            object.dirChanged = True
-    elif(key == curses.KEY_DOWN and (not pause) and (not object.dirChanged)):
-        if object.dir != 3:
-            object.dir = 1
-            object.dirChanged = True
-    elif(key == curses.KEY_LEFT and (not pause) and (not object.dirChanged)):
-        if object.dir != 0:
-            object.dir = 2
-            object.dirChanged = True
-    elif(key == curses.KEY_RIGHT and (not pause) and (not object.dirChanged)):
-        if object.dir != 2:
-            object.dir = 0
-            object.dirChanged = True
+    if(key == curses.KEY_UP and (not pause)):
+        if object.lastDir != 1 and object.dir != 1:
+            if not object.dirChanged:
+                object.dir = 3
+                object.dirChanged = True
+            else:
+                object.nextDir = 3
+    elif(key == curses.KEY_DOWN and (not pause)):
+        if object.lastDir != 3 and object.dir != 3:
+            if not object.dirChanged:
+                object.dir = 1
+                object.dirChanged = True
+            else:
+                object.nextDir = 1
+    elif(key == curses.KEY_LEFT and (not pause)):
+        if object.lastDir != 0 and object.dir != 0:
+            if not object.dirChanged:
+                object.dir = 2
+                object.dirChanged = True
+            else:
+                object.nextDir = 2
+    elif(key == curses.KEY_RIGHT and (not pause)):
+        if object.lastDir != 2 and object.dir != 2:
+            if not object.dirChanged:
+                object.dir = 0
+                object.dirChanged = True
+            else:
+                object.nextDir = 0
     elif(key == ord('r')):
         newWalls = object.solidWalls
         object = Board()
@@ -251,7 +269,7 @@ wrapper(main)               #wrapper catches exceptions, closes curses and then 
 
 
 curses.nocbreak()           #terminate curses commands
-stdscr.nodelay(False)        
+stdscr.nodelay(False)
 stdscr.keypad(False)
 curses.echo()
 curses.endwin()

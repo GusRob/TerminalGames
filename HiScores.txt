@@ -3,5 +3,5 @@ Game Score
 Tetris 0
 Os&Xs 6
 Battleships 33
-Snake 26
+Snake 29
 Greed 125
