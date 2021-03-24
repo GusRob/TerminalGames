@@ -4,7 +4,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 ## This repository will consist of a series of Terminal minigames
 *  - [X] 2048 block sliding game
 *  - [X] Noughts and Crosses
-*  - [ ] Tetris
+*  - [X] Tetris
 *  - [X] Battleships
 *  - [X] Snake
 *  - [X] Greed
@@ -76,3 +76,9 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
   * User moves a 'snake' around a grid of numbers without a clock/auto moving
   * When moving in one direction the snake moves as far as the first digit it comes across dictates
   * The user loses when going into themselves or off the board
+ 
+2021/03/24
+  * Tetris game completed
+  * Includes next piece window and 'holding' pieces
+  * Also further developed snake game to queue user keypresses
+  * Until I think of new games to add, all that's left is opponent development
