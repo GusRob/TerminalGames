@@ -33,9 +33,10 @@ class Piece:
     [[1, 4, 5, 6], [1, 4, 5, 9], [4, 5, 6, 9], [1, 5, 6, 9]],   #T Shape
     [[1, 2, 5, 6]], #O Shape
     ]
-    def __init__(self, initX, initY, board):
+    def __init__(self, initX, initY, board, initType, initNType):
         self.pos = [initX,initY]
-        self.type = random.randint(0,6)
+        self.type = initType
+        self.nextType = initNType
         self.board = board
         self.rotation = 0
     def cells(self):
@@ -48,7 +49,6 @@ class Piece:
         canRotate = self.checkIntersect([self.pos[0], self.pos[1]], (self.rotation+1)%len(self.pieces[self.type]), self.type)
         if canRotate :
             self.rotation = (self.rotation+1)%len(self.pieces[self.type])
-        return
         return
     def move(self, direction):
         canMove = self.checkIntersect([self.pos[0] + direction, self.pos[1]], self.rotation, self.type)
@@ -67,8 +67,9 @@ class Piece:
             val = self.pieces[self.type][self.rotation][i]
             coords = [self.pos[0] + val%4 , self.pos[1] + int(val/4)]
             self.board.state[coords[1]][coords[0]] = self.type+1
-        self.board.piece = self.board.newPiece()
         self.board.update()
+        if(not self.board.gameOver):
+            self.board.piece = self.board.newPiece(self.nextType, -1)
         return
     def checkIntersect(self, newPos, newRot, newType):
         isValid = True
@@ -87,20 +88,84 @@ class Board:
         self.state = [[0 for i in range(7)] for j in range(25)]
         self.gameOver = False
         self.moveCounter = 0
-        self.piece = self.newPiece()
+        self.piece = self.newPiece(random.randint(0,6), -1)
+        self.held = -1
         self.speed = 10
         self.score = 0
         self.newHigh = False
         self.next = 0
         self.saved = 0
-    def newPiece(self):
-        return Piece(0,0,self)
-    def deleteRow(self):
+    def newPiece(self, Type, nextType):
+        initNext = nextType if nextType != -1 else random.randint(0,6)
+        return Piece(2,0,self,Type, initNext)
+    def deleteRow(self, n):
+        for i in range(len(self.state))[n:1:-1]:
+            for j in range(len(self.state[0])):
+                self.state[i][j] = self.state[i-1][j]
         return
     def update(self):
+        rowsDeleted = 0
+        i = len(self.state)-1
+        while i > 0:
+            full = True
+            for j in range(len(self.state[0])):
+                val = self.state[i][j]
+                if val == 0:
+                    full = False
+            if(full):
+                self.deleteRow(i)
+                rowsDeleted +=1
+            else:
+                i-=1
+        for i in range(len(self.state[0])):
+            if self.state[3][i] != 0:
+                self.gameOver = True
+        if not self.gameOver:
+            if(rowsDeleted == 0):
+                self.score += 1
+            elif rowsDeleted == 1:
+                self.score += 10
+            elif rowsDeleted == 2:
+                self.score += 25
+            elif rowsDeleted == 3:
+                self.score += 50
+            elif rowsDeleted == 4:
+                self.score += 100
+        return
+    def hold(self):
+        if(self.held == -1):
+            self.held = self.piece.type
+            self.piece = self.newPiece(self.piece.nextType, -1)
+        else :
+            tmp = self.held
+            self.held = self.piece.type
+            self.piece = self.newPiece(tmp, self.piece.nextType)
         return
     def __str__(self, stdscr):
-        nextWin = ["╔════════╗", "║        ║","║        ║","║        ║","╚════════╝", "", "","","", "","", "", "","","", "","", "","", "","","", "", " Held:", "╔════════╗","║        ║","║        ║", "║        ║"]
+        nextWin = ["╔════════╗", "║        ║","║        ║","║        ║","╚════════╝","", "","", "", "","","", "","", "","", "","","", "", " Held:", "╔════════╗","║        ║","║        ║", "║        ║"]
+        nextCells = []
+        for i in range(4):
+            val = self.piece.pieces[self.piece.nextType][0][i]
+            nextCells.append([val%4 , int(val/4)])
+        for i in range(3):
+            line = ""
+            for j in range(4):
+                val = '██' if [j,i] in nextCells else '  '
+                col = self.piece.nextType+1
+                line += val
+            nextWin[i+1] =  "║" + line + "║"
+        if(self.held != -1):
+            heldCells = []
+            for i in range(4):
+                val = self.piece.pieces[self.held][0][i]
+                heldCells.append([val%4 , int(val/4)])
+            for i in range(3):
+                line = ""
+                for j in range(4):
+                    val = '██' if [j,i] in heldCells else '  '
+                    col = self.held+1
+                    line += val
+                nextWin[i+22] =  "║" + line + "║"
         stdscr.addstr("╔════════════════╗ Next:\n")
         for i in range(len(self.state)):
             stdscr.addstr("║ ")
@@ -115,7 +180,17 @@ class Board:
                         col = 7 if i == 3 else 3
                         stdscr.addstr('⤙⤚', curses.color_pair(col))#'░░''⇃↾''⤙⤚''⟶⟵'
             addition = nextWin[i]
-            stdscr.addstr(" ║" + addition + "\n")
+            if '██' in addition:
+                if(i < 10):
+                    stdscr.addstr(" ║║")
+                    stdscr.addstr(addition[1:-1], curses.color_pair(self.piece.nextType+1))
+                    stdscr.addstr("║\n")
+                else:
+                    stdscr.addstr(" ║║")
+                    stdscr.addstr(addition[1:-1], curses.color_pair(self.held+1))
+                    stdscr.addstr("║\n")
+            else:
+                stdscr.addstr(" ║" + addition + "\n")
         stdscr.addstr("╚════════════════╝╚════════╝\n")
 
         return
@@ -165,13 +240,13 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore):
     elif(key == curses.KEY_RIGHT and (not pause)):
         object.piece.move(1)
     elif(key == ord('r')):
+        if(object.newHigh):
+            updateHScore(object.score)
+            hScore = readHScore()
         object = Board()
         pause = True
-    elif(key == ord('i')):
-        newWalls = not object.solidWalls
-        object = Board()
-        object.solidWalls = newWalls
-        pause = True
+    elif(key == ord(' ')):
+        object.hold()
 
     if not pause:
         object.moveCounter += 1
@@ -181,7 +256,6 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore):
 
     if(object.gameOver):
         pause = True
-        object.death-=1
 
     object.__str__(stdscr)
 
@@ -205,7 +279,8 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore):
         info.addstr("Use the Left and Right Keys to move\n")
         info.addstr("Use the Up Key to rotate\n")
         info.addstr("Use the Down Key to drop\n")
-        info.addstr("Complete a row for points!\n")
+        info.addstr("Complete a row to delete!\n")
+        info.addstr("Use the Space key to hold a piece\n\n")
         info.addstr("Use the 'R' key to reset\n")
         info.addstr("Use the 'Q' key to quit\n\n")
     stdscr.refresh()
@@ -233,7 +308,7 @@ def main(stdscr):           #main function is entry point to game
     info = curses.newwin(rows, 35, 0, x)
 
     pause = True
-    keys = [curses.KEY_UP, curses.KEY_DOWN, curses.KEY_LEFT, curses.KEY_RIGHT, curses.KEY_ENTER, ord('q'), ord('r'), ord('i')]
+    keys = [curses.KEY_UP, curses.KEY_DOWN, curses.KEY_LEFT, curses.KEY_RIGHT, curses.KEY_ENTER, ord('q'), ord('r'), ord(' ')]
     key = -1
 
     while key != ord('q'):
