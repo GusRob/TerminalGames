@@ -1,6 +1,6 @@
 Game Score
 2048 7024
-Tetris 10
+Tetris 443
 Os&Xs 6
 Battleships 33
 Snake 29

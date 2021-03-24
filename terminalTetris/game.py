@@ -35,10 +35,30 @@ class Piece:
     ]
     def __init__(self, initX, initY, board, initType, initNType):
         self.pos = [initX,initY]
+        self.shadowY = 2
         self.type = initType
         self.nextType = initNType
         self.board = board
         self.rotation = 0
+        self.shadow()
+    def shadowCells(self):
+        result = []
+        for i in range(4):
+            val = self.pieces[self.type][self.rotation][i]
+            result.append([self.pos[0] + val%4 , self.shadowY + int(val/4)])
+        return result
+    def shadow(self):
+        currentHeight = 0
+        possLocation = True
+        while possLocation :
+            isValid = self.checkIntersect([self.pos[0], self.pos[1]+currentHeight], self.rotation, self.type)
+            if not isValid:
+                possLocation = False
+                currentHeight-=1
+            else:
+                currentHeight += 1
+        self.shadowY = self.pos[1] + currentHeight
+        return
     def cells(self):
         result = []
         for i in range(4):
@@ -49,11 +69,13 @@ class Piece:
         canRotate = self.checkIntersect([self.pos[0], self.pos[1]], (self.rotation+1)%len(self.pieces[self.type]), self.type)
         if canRotate :
             self.rotation = (self.rotation+1)%len(self.pieces[self.type])
+        self.shadow()
         return
     def move(self, direction):
         canMove = self.checkIntersect([self.pos[0] + direction, self.pos[1]], self.rotation, self.type)
         if canMove :
             self.pos[0] += direction
+        self.shadow()
         return
     def drop(self):
         canDrop = self.checkIntersect([self.pos[0], self.pos[1]+1], self.rotation, self.type)
@@ -90,12 +112,13 @@ class Board:
         self.moveCounter = 0
         self.piece = self.newPiece(random.randint(0,6), -1)
         self.held = -1
-        self.speed = 10
+        self.swapped = False
+        self.speed = 8
         self.score = 0
         self.newHigh = False
-        self.next = 0
-        self.saved = 0
+        self.death = -1
     def newPiece(self, Type, nextType):
+        self.swapped = False
         initNext = nextType if nextType != -1 else random.randint(0,6)
         return Piece(2,0,self,Type, initNext)
     def deleteRow(self, n):
@@ -131,6 +154,14 @@ class Board:
                 self.score += 50
             elif rowsDeleted == 4:
                 self.score += 100
+            if self.score > 100:
+                self.speed = 6
+            if self.score > 500:
+                self.speed = 4
+            if self.score > 1000:
+                self.speed = 2
+            if self.score > 3000:
+                self.speed = 1
         return
     def hold(self):
         if(self.held == -1):
@@ -140,6 +171,7 @@ class Board:
             tmp = self.held
             self.held = self.piece.type
             self.piece = self.newPiece(tmp, self.piece.nextType)
+        self.swapped = True
         return
     def __str__(self, stdscr):
         nextWin = ["╔════════╗", "║        ║","║        ║","║        ║","╚════════╝","", "","", "", "","","", "","", "","", "","","", "", " Held:", "╔════════╗","║        ║","║        ║", "║        ║"]
@@ -172,10 +204,14 @@ class Board:
             for j in range(len(self.state[0])):
                 val = self.state[i][j]
                 if val != 0:
+                    if(self.death > i):
+                        val = 7
                     stdscr.addstr('██', curses.color_pair(val))
                 else:
                     if([j,i] in self.piece.cells()):
                         stdscr.addstr('██', curses.color_pair(self.piece.type+1))
+                    elif([j,i] in self.piece.shadowCells()):
+                        stdscr.addstr('░░', curses.color_pair(self.piece.type+1)) #▓▓ ▒▒
                     else:
                         col = 7 if i == 3 else 3
                         stdscr.addstr('⤙⤚', curses.color_pair(col))#'░░''⇃↾''⤙⤚''⟶⟵'
@@ -245,7 +281,7 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore):
             hScore = readHScore()
         object = Board()
         pause = True
-    elif(key == ord(' ')):
+    elif(key == ord(' ') and (not object.swapped)):
         object.hold()
 
     if not pause:
@@ -256,6 +292,7 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore):
 
     if(object.gameOver):
         pause = True
+        object.death += 1
 
     object.__str__(stdscr)
 
