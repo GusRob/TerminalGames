@@ -17,7 +17,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 
 #### Executable file
 
-  * [MACOS ONLY] The standalone executable is located in the folder 'TerminalGames/dist' and can be run from a graphical file explorer by opening, which should open a terminal with the CLI running
+  * [MACOS ONLY] The standalone executable is located in the folder 'TerminalGames/dist' and can be run from a GUI file explorer by opening, which should open a terminal with the CLI running
   
 #### Run from command line
 
