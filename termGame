@@ -9,8 +9,8 @@ from prompt_toolkit.completion import WordCompleter
 
 
 
-commands = ["2048", "OsXs", "ships", "snake", "tetris", "greed"]
-out = ["2048", "OsXs", "BattleShips", "Snake", "Tetris", "Greed"]
+commands = ["2048", "OsXs", "ships", "snake", "tetris", "greed", "pipes"]
+out = ["2048", "OsXs", "BattleShips", "Snake", "Tetris", "Greed", "Pipes"]
 
 commandPrompts = commands[:]
 commandPrompts.append("help")
@@ -75,16 +75,20 @@ while(termArguments[1] != "quit"):
             print(line)
         print("*" + '%12s'%"" + "\t*\t" + '%11s'%"*")
         print("***********************************\n")
+    elif(termArguments[1] == "version" or termArguments[1] == "v"):
+        print("termGame Version 0.8.0")
+        termArguments[1] = "quit"
     elif(termArguments[1] != ""):
         print("\nCommand not recognised\n")
 
-    print("\n\nPlease enter a command")
-    print("Use 'quit' to exit or 'help' for a list of games\n")
-    width = os.get_terminal_size().columns
-    print("─"* width)
-    termArguments[1] = prompt('~~~',
-                        history=FileHistory(os.path.abspath(os.path.dirname(__file__)) + '/.termGame_history'),
-                        auto_suggest=AutoSuggestFromHistory(),
-                        #completer=CompleterList,
-                        )
-    print("─"* width)
+    if(termArguments[1] != "quit"):
+        print("\n\nPlease enter a command")
+        print("Use 'quit' to exit or 'help' for a list of games\n")
+        width = os.get_terminal_size().columns
+        print("─"* width)
+        termArguments[1] = prompt('~~~',
+                            history=FileHistory(os.path.abspath(os.path.dirname(__file__)) + '/.termGame_history'),
+                            auto_suggest=AutoSuggestFromHistory(),
+                            #completer=CompleterList,
+                            )
+        print("─"* width)

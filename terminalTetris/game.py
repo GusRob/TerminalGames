@@ -86,6 +86,7 @@ class Piece:
         return
     def place(self):
         self.pos[1] = self.shadowY
+
         return
     def addPieceToBoard(self):
         for i in range(4):
@@ -274,6 +275,7 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore):
         object.piece.rotate()
     elif(key == curses.KEY_DOWN and (not pause)):
         object.piece.place()
+        object.moveCounter = 0
     elif(key == curses.KEY_LEFT and (not pause)):
         object.piece.move(-1)
     elif(key == curses.KEY_RIGHT and (not pause)):

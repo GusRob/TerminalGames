@@ -8,6 +8,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 *  - [X] Battleships
 *  - [X] Snake
 *  - [X] Greed
+*  - [ ] Pipes
 
 #### Opponents
 *  - [ ] Noughts and Crosses
@@ -18,7 +19,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 #### Executable file
 
   * [MACOS ONLY] The standalone executable is located in the folder 'TerminalGames/dist' and can be run from a GUI file explorer by opening, which should open a terminal with the CLI running
-  
+
 #### Run from command line
 
   * To run the minigame interface, the 'termGame' file can be executed as any other executable file with the name of the game to play as an argument due to it's shebang addition, allowing the user to call, for example './termGame 2048' to launch the 2048 game
@@ -76,7 +77,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
   * User moves a 'snake' around a grid of numbers without a clock/auto moving
   * When moving in one direction the snake moves as far as the first digit it comes across dictates
   * The user loses when going into themselves or off the board
- 
+
 2021/03/24
   * Tetris game completed
   * Includes next piece window and 'holding' pieces
