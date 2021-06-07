@@ -34,15 +34,40 @@ class Board:
         self.valid = True
         self.pWinner = None
         self.selected = [0,0]
+        self.cpuMode = "run"
+        self.currentTarget = [-1, -1]
         #self.shipSigns = ["⦻ ", "▲ ", "▶ ", "▼ ", "◀ ", "■ ", "◎ ", "≈ "]
-    def cpuShoot(self):
+    def runAndGun(self):
+        if(self.cpuMode == "run"):
+            empties = []
+            for i in range(self.size):
+                for j in range(self.size):
+                    if(self.state[3][j][i] ==  "≈"):
+                        empties.append([j,i])
+            result = empties[random.randint(0, len(empties)-1)]
+            hit, sink = self.makeShot(result, False)
+            if(hit and not sink):
+                self.cpuMode = "gun"
+                self.currentTarget = result
+            else :
+                self.cpuMode = "run"
+        elif(self.cpuMode == "gun" or self.cpuMode == "gunV" or self.cpuMode == "gunH") :
+            #shoot in all avail directions around self.currentTarget
+            #set mode to gunV if ship appears vertical, and gunH if horizontal
+            #WONT WORK FOR SHIPS STACKED TOGETHER
+            print("")
+        return
+    def mayhem(self):
         empties = []
         for i in range(self.size):
             for j in range(self.size):
                 if(self.state[3][j][i] ==  "≈"):
                     empties.append([j,i])
         result = empties[random.randint(0, len(empties)-1)]
-        self.makeShot(result, False)
+        hit = self.makeShot(result, False)
+        return
+    def cpuShoot(self):
+        self.mayhem()
         return
     def checkWinners(self, player):
         hits = 0
@@ -57,6 +82,7 @@ class Board:
         result =  self.state[2 if player else 1][shot[0]][shot[1]]
         target = self.state[0 if player else 3][shot[0]][shot[1]]
         if( target == "≈"):
+            sunk = False
             if result in ["▲", "▶", "▼", "◀", "■"]:
                 if(player):
                     self.score += 1
@@ -92,9 +118,9 @@ class Board:
             else:
                 self.state[0 if player else 3][shot[0]][shot[1]] = "◎"
             self.checkWinners(player)
-            return True
+            return True, sunk
         else:
-            return False
+            return False, False
     def __str__(self, stdscr):
         falses = [False, False, False, False]
         drawVal(stdscr, "Your Targets: " + "Your Ships:".rjust(self.size * 2 + 1) + "\n╔", falses)
@@ -311,7 +337,7 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore, boardSize):
         if object.mode == "placing" and object.valid:
             object.placeHeld()
         elif object.mode == "playing":
-            success = object.makeShot(object.selected, True)
+            success, _ = object.makeShot(object.selected, True)
             if(success):
                 object.cpuShoot()
         else:

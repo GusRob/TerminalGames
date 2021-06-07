@@ -50,6 +50,14 @@ class Board:
         if (isWinnerOTmp and isWinnerXTmp):
             result = 0
         return result
+    def minimax(self, stateTmp, isMin):
+        # IF GAME COMPLETE, RETURN BOARD VALUE
+
+        # ELSE CONSIDER EVERY POSSIBLE MOVE (BLANK SPACES)
+            # FOR EACH MOVE, COMPUTE MINIMAX
+
+            # RETURN MOVE WITH HIGHEST/LOWEST SCORE DEP. ON ISMIN
+        return
     def bestTurn(self):
         moves = self.getEmpty(self.state)
         move = moves[random.randint(0,len(moves)-1)]
