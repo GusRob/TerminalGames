@@ -186,6 +186,10 @@ class Board:
             #drawVal(stdscr, str(self.heatmap[i]) + "\n", falses)
         #for i in range(self.size):
             #drawVal(stdscr, str(self.state[3][i]) + "\n", falses)
+        for i in self.heatmap:
+            drawVal(stdscr, str(i) + "\n", falses)
+        drawVal(stdscr, "P : " + str(self.pShips) + "\n", falses)
+        drawVal(stdscr, "C : " + str(self.cShips) + "\n", falses)
         drawVal(stdscr, "Your Targets: " + "Your Ships:".rjust(self.size * 2 + 1) + "\n╔", falses)
         for i in range(self.size * 2 + 1):
             drawVal(stdscr, "═", falses)
@@ -280,7 +284,7 @@ class Board:
                 self.state[1][part[0]][part[1]] = ends[self.heldO]
             else:
                 self.state[1][part[0]][part[1]] = "■"
-        self.pShips.append([self.held, self.heldO, self.selected, False])
+        self.pShips.append([self.ships[self.held], self.heldO, self.selected, False])
         if self.held < len(self.ships)-1:
             self.held = self.held + 1
         else:
