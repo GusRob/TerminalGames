@@ -24,6 +24,7 @@ class Board:
     def __init__(self, size):
         self.size = size  #playershots playerships enemyships enemyshots
         self.state = [[["≈" for i in range(size)] for j in range(size)], [["≈" for i in range(size)] for j in range(size)], [["≈" for n in range(size)] for j in range(size)], [["≈" for n in range(size)] for j in range(size)]]
+        self.heatmap = [[0 for i in range(size)] for j in range(size)]
         self.score = 0
         self.mode = "placing"
         self.ships = [5, 4, 3, 3, 2]
@@ -35,38 +36,89 @@ class Board:
         self.pWinner = None
         self.selected = [0,0]
         self.cpuMode = "run"
-        self.currentTarget = [-1, -1]
+        self.currentTarget = [[-1, -1], 0, 0] #last hit without a sink, index of direction, length in direction
         #self.shipSigns = ["⦻ ", "▲ ", "▶ ", "▼ ", "◀ ", "■ ", "◎ ", "≈ "]
     def runAndGun(self):
         if(self.cpuMode == "run"):
             empties = []
             for i in range(self.size):
                 for j in range(self.size):
-                    if(self.state[3][j][i] ==  "≈"):
+                    if(self.state[3][j][i] ==  "≈" and (i+j)%2 == 0): # hit randomly in a checkerboard
                         empties.append([j,i])
             result = empties[random.randint(0, len(empties)-1)]
-            hit, sink = self.makeShot(result, False)
+            _, hit, sink = self.makeShot(result, False)
             if(hit and not sink):
                 self.cpuMode = "gun"
-                self.currentTarget = result
+                self.currentTarget[0] = result
             else :
                 self.cpuMode = "run"
-        elif(self.cpuMode == "gun" or self.cpuMode == "gunV" or self.cpuMode == "gunH") :
-            #shoot in all avail directions around self.currentTarget
-            #set mode to gunV if ship appears vertical, and gunH if horizontal
-            #WONT WORK FOR SHIPS STACKED TOGETHER
-            print("")
+        elif(self.cpuMode == "gun") :
+            directions = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+            loop = true
+            while(loop):
+
+                dir = directons[self.currentTarget[1]]
+                dist = self.currentTarget[2]
+
+                target = self.state[3][self.currentTarget[0][0] + dir[0]*dist][self.currentTarget[0][1] + dir[1]*dist]
+
+                if(target == "⦻"):
+                    self.currentTarget[2] += 1
+                elif(target == "≈"):
+                    target = target
+                else:
+
+                    if(self.currentTarget[1] <= 3):
+                        self.currentTarget[1] += 1
+                    else :
+                        raise ValueError('A very specific bad thing happened')
+
+        return
+    def generateHeatmap(self):
+        result = [[0 for i in range(self.size)] for j in range(self.size)]
+        for a in range(self.size):
+            for b in range(self.size):
+                if self.state[3][a][b] == "≈":
+                    sum = 0
+                    for d in [[0,1], [0,-1], [1, 0], [-1, 0]]:
+                        loop = True
+                        n = 0
+                        while(loop):
+                            k = a + d[0]*n
+                            l = b + d[1]*n
+                            if(0 <= k and k < self.size and 0 <= l and l < self.size):
+                                target = self.state[3][k][l]
+                            else:
+                                target = " "
+
+                            if(target != "⦻" and target != "≈"):
+                                loop = False
+                            else:
+                                if(target == "⦻"):
+                                    sum += 10
+                                n += 1
+                            if n > 5:
+                                loop = False
+                        for ship in self.pShips:
+                            if n >= ship[0] and not ship[3]:
+                                sum += 1
+                    result[a][b] = sum
+                else:
+                    result[a][b] = -1
+        self.heatmap = result
         return
     def mayhem(self):
+        top = max([max(x) for x in self.heatmap])
         empties = []
         for i in range(self.size):
             for j in range(self.size):
-                if(self.state[3][j][i] ==  "≈"):
+                if(self.state[3][j][i] ==  "≈" and self.heatmap[j][i] == top):
                     empties.append([j,i])
         result = empties[random.randint(0, len(empties)-1)]
         hit = self.makeShot(result, False)
         return
     def cpuShoot(self):
+        self.generateHeatmap()
         self.mayhem()
         return
     def checkWinners(self, player):
@@ -82,15 +134,17 @@ class Board:
         result =  self.state[2 if player else 1][shot[0]][shot[1]]
         target = self.state[0 if player else 3][shot[0]][shot[1]]
         if( target == "≈"):
+            hit = False
             sunk = False
             if result in ["▲", "▶", "▼", "◀", "■"]:
+                hit = True
                 if(player):
                     self.score += 1
                 else:
                     self.score -= 1
                 self.state[0 if player else 3][shot[0]][shot[1]] = "⦻"
-                for n in range(len(self.cShips)):
-                    ship = self.cShips[n]
+                for n in range(len(self.cShips if player else self.pShips)):
+                    ship = self.cShips[n] if player else self.pShips[n]
                     if(not ship[3]):
                         sunk = True
                         shipSqs = []
@@ -115,14 +169,23 @@ class Board:
                                     self.state[0 if player else 3][part[0]][part[1]] = ends[ship[1]]
                                 else:
                                     self.state[0 if player else 3][part[0]][part[1]] = "■"
+                            if player:
+                                self.cShips[n][3] = True
+                            else:
+                                self.pShips[n][3] = True
             else:
+                hit = False
                 self.state[0 if player else 3][shot[0]][shot[1]] = "◎"
             self.checkWinners(player)
-            return True, sunk
+            return True, hit, sunk
         else:
-            return False, False
+            return False, False, False
     def __str__(self, stdscr):
         falses = [False, False, False, False]
+        #for i in range(self.size):
+            #drawVal(stdscr, str(self.heatmap[i]) + "\n", falses)
+        #for i in range(self.size):
+            #drawVal(stdscr, str(self.state[3][i]) + "\n", falses)
         drawVal(stdscr, "Your Targets: " + "Your Ships:".rjust(self.size * 2 + 1) + "\n╔", falses)
         for i in range(self.size * 2 + 1):
             drawVal(stdscr, "═", falses)
@@ -337,7 +400,7 @@ def gameLoop(stdscr, info, key, keys, object, pause, hScore, boardSize):
         if object.mode == "placing" and object.valid:
             object.placeHeld()
         elif object.mode == "playing":
-            success, _ = object.makeShot(object.selected, True)
+            success, _, _ = object.makeShot(object.selected, True)
             if(success):
                 object.cpuShoot()
         else:
