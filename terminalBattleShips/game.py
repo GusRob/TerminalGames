@@ -67,7 +67,6 @@ class Board:
                 elif(target == "≈"):
                     target = target
                 else:
-
                     if(self.currentTarget[1] <= 3):
                         self.currentTarget[1] += 1
                     else :
@@ -186,10 +185,10 @@ class Board:
             #drawVal(stdscr, str(self.heatmap[i]) + "\n", falses)
         #for i in range(self.size):
             #drawVal(stdscr, str(self.state[3][i]) + "\n", falses)
-        for i in self.heatmap:
-            drawVal(stdscr, str(i) + "\n", falses)
-        drawVal(stdscr, "P : " + str(self.pShips) + "\n", falses)
-        drawVal(stdscr, "C : " + str(self.cShips) + "\n", falses)
+        #for i in self.heatmap:
+        #    drawVal(stdscr, str(i) + "\n", falses)
+        #drawVal(stdscr, "P : " + str(self.pShips) + "\n", falses)
+        #drawVal(stdscr, "C : " + str(self.cShips) + "\n", falses)
         drawVal(stdscr, "Your Targets: " + "Your Ships:".rjust(self.size * 2 + 1) + "\n╔", falses)
         for i in range(self.size * 2 + 1):
             drawVal(stdscr, "═", falses)
