@@ -12,7 +12,7 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
 
 #### Opponents
 *  - [ ] Noughts and Crosses
-*  - [ ] Battleships
+*  - [X] Battleships
 
 ## Usage Instructions
 
@@ -83,3 +83,13 @@ Simple games to play in the terminal using the 'curses' screen and keyboard hand
   * Includes next piece window and 'holding' pieces
   * Also further developed snake game to queue user keypresses
   * Until I think of new games to add, all that's left is opponent development
+
+2021/07/29
+  * Battleships heatmap opponent implemented
+    * Computes heatmap of positions of ships on the board and shoots at highest probability cell
+    * In the case of a tie, shoots at any random of highest cells
+    * Heatmap generation is not perfect
+      * To improve efficiency of algorithm, instead of computing every combination of all ships and summing each permutation that has a ship over cell X for all cells, the algorithm instead, for each cell computes all possible positions of ships over that cell and sums.
+      * The problem with this is in some cases where there are very few spaces left for ships the combination of certain ships may not be possible due to other ships being in the way. The error in this is miniscule however and only relevant in situations with very few spaces available for ships.
+      * While typing this i have realised an error in the generation algorithm. At the moment the algorithm only computes every position of ships that start/finish (these are equal mathematically, due to symmetrical ships) and does not consider if a ship could be centered over the cell in question
+
