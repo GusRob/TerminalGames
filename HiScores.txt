@@ -1,8 +1,8 @@
 Game Score
 2048 7024
-Tetris 1040
+Tetris 1199
 Os&Xs 8
 Battleships 33
-Snake 29
+Snake 36
 Greed 125
 Pipes 0
